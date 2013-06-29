@@ -1,0 +1,28 @@
+<!doctype html>
+<head>
+  <title>CompostagIC</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+    <h1>{{ passaro[1] }} (<i>{{ passaro[0] }}</i>)</h1>
+    {% for reg in registros %}
+        <div class="wrap">
+            Registro feito em {{ reg[3] }}<br />
+            <div class="left">
+                {% if reg[6] %}
+                    <img src="{{ url_for('static', filename='images/' + reg[6]) }}" width="300px" /><br />
+                {% endif %}
+                {% if reg[5] %}
+                    <audio controls>
+                        <source src="{{ url_for('static', filename='sounds/' + reg[5]) }}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                {% endif %}
+            </div>
+            <div class="right">
+<!--                 <img src="http://maps.googleapis.com/maps/api/staticmap?center=Brazil&zoom=3&size=300x300&maptype=roadmap&markers=color:red|{{ reg[2] }}&sensor=false" /> -->
+                <img src="{{ url_for('static', filename='staticmap.png') }}" />
+            </div>
+        </div>
+    {% endfor %}
+</body>

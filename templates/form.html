@@ -1,0 +1,89 @@
+<!doctype html>
+<head>
+  <title>CompostagIC</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+  <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+    <script>
+      var unicamp = new google.maps.LatLng(-22.817708, -47.068316);
+      var marker;
+      var mapDiv;
+      var map;
+
+      function initialize() {
+        var mapOptions = {
+          zoom: 13,
+          mapTypeId: google.maps.MapTypeId.ROADMAP,
+          center: unicamp
+        };
+
+        mapDiv = document.getElementById('map-canvas');
+        map = new google.maps.Map(mapDiv, mapOptions);
+
+        marker = new google.maps.Marker({
+          map: map,
+          draggable: true,
+          animation: google.maps.Animation.DROP,
+          position: unicamp
+        });
+
+        google.maps.event.addListener(marker, 'dragend', updateForm);
+        updateForm();
+      }
+
+      google.maps.event.addDomListener(window, 'load', initialize);
+
+      function updateForm() {
+        document.getElementById('coord_lat').value = marker.getPosition().lat();
+        document.getElementById('coord_lng').value = marker.getPosition().lng();
+        document.getElementById('search_address').value = marker.getPosition();
+      }
+    </script>
+    <script>
+      var addressField;
+      var geocoder;
+
+      function initialize2() {
+        addressField = document.getElementById('search_address');
+        geocoder = new google.maps.Geocoder();
+      }
+
+      function search() {
+          geocoder.geocode(
+              {'address': addressField.value}, 
+              function(results, status) { 
+                  if (status == google.maps.GeocoderStatus.OK) { 
+                      var loc = results[0].geometry.location;
+                      // use loc.lat(), loc.lng()
+                      marker.setPosition(loc);
+                      map.setCenter(loc);
+                      updateForm();
+                  } 
+                  else {
+                      alert("Not found: " + status); 
+                  } 
+              }
+          );
+      };
+
+      google.maps.event.addDomListener(window, 'load', initialize2);
+    </script>
+</head>
+<body>
+    <h1>Upload</h1>
+    <form action="" method="post" enctype="multipart/form-data">
+      Nome científico do pássaro: <input type="text" name="name" /><br />
+      Nome comum (opcional): <input type="text" name="common_name" /><br />
+      Foto: <input type="file" name="image" /><br />
+      Som: <input type="file" name="sound" /><br />
+      Data: <input type="date" name="date" /><br />
+      Hora: <input type="time" name="time" /><br />
+      <input type="submit" value="Upload" /><br />
+
+      <input type="hidden" name="coord_lat" id="coord_lat" />
+      <input type="hidden" name="coord_lng" id="coord_lng" />
+    </form>
+    Localização:
+    <input type="text" id="search_address" value="" size="40" />
+    <button onclick="search();">Search</button>
+    <div id="map-canvas"></div>
+</body>

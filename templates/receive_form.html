@@ -1,0 +1,16 @@
+<!doctype html>
+<head>
+  <title>CompostagIC</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+    <h1>File uploaded</h1>
+    name: {{ name }}<br />
+    common_name: {{ common_name }}<br />
+    image: {{ image_filename }}<br />
+    sound: {{ sound_filename }}<br />
+    coord_lat: {{ coord_lat }}<br />
+    coord_lng: {{ coord_lng }}<br />
+    date: {{ date }}<br />
+    time: {{ time }}<br />
+</body>

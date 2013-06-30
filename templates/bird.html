@@ -14,7 +14,7 @@
                 {% endif %}
                 {% if reg[5] %}
                     <audio controls>
-                        <source src="{{ url_for('static', filename='sounds/' + reg[5]) }}" type="audio/mpeg">
+                        <source src="{{ url_for('static', filename='sounds/' + reg[5]) }}" type="audio/{{ media_type_f(reg[5]) }}">
                         Your browser does not support the audio element.
                     </audio>
                 {% endif %}

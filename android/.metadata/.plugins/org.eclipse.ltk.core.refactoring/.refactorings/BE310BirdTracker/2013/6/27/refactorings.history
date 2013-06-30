@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename field &apos;extAudioRecorder&apos; in &apos;com.example.be310birdtracker.MainActivity&apos; to &apos;mExtAudioRecorder&apos;&#x0A;- Original project: &apos;BE310BirdTracker&apos;&#x0A;- Original element: &apos;com.example.be310birdtracker.MainActivity.extAudioRecorder&apos;&#x0A;- Renamed element: &apos;com.example.be310birdtracker.MainActivity.mExtAudioRecorder&apos;&#x0A;- Update references to refactored element&#x0A;- Update textual occurrences in comments and strings" delegate="false" deprecate="false" description="Rename field &apos;extAudioRecorder&apos;" flags="589826" getter="false" id="org.eclipse.jdt.ui.rename.field" input="/src&lt;com.example.be310birdtracker{MainActivity.java[MainActivity^extAudioRecorder" name="mExtAudioRecorder" references="true" setter="false" stamp="1372554859257" textual="false" version="1.0"/>
+</session>

@@ -1,0 +1,208 @@
+package com.example.be310birdtracker;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+
+import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.util.Log;
+import android.view.Menu;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.ImageView;
+
+public class MainActivity extends Activity {
+
+	int PICTURE_REQ_CODE = 1;
+	private static String LOG_TAG = "log tag";
+
+	ImageView mImageView;
+	Bitmap mImageBitmap;
+
+    private static String mFileName = null;
+	private ExtAudioRecorder mExtAudioRecorder = null;
+	protected boolean mStartRecording, mStartPlaying;
+	private MediaPlayer mPlayer = null;
+
+	private Button mRecordButton, mPlayButton;
+	private Button mSendButton;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        mRecordButton = (Button) findViewById(R.id.button1);
+        mRecordButton.setText("Start recording");
+        mStartRecording = true;
+        mRecordButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+                onRecord(mStartRecording);
+                if (mStartRecording) {
+                    ((Button) v).setText("Stop recording");
+                    mPlayButton.setActivated(true);
+                } else {
+                	((Button) v).setText("Start recording");
+                }
+                mStartRecording = !mStartRecording;
+			}
+        });
+
+        mPlayButton = (Button) findViewById(R.id.button2);
+        mPlayButton.setText("Start playing");
+        mPlayButton.setActivated(false);
+        mStartPlaying = true;
+        mPlayButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                onPlay(mStartPlaying);
+                if (mStartPlaying) {
+                	((Button) v).setText("Stop playing");
+                } else {
+                	((Button) v).setText("Start playing");
+                }
+                mStartPlaying = !mStartPlaying;
+            }
+        });
+
+        mSendButton = (Button) findViewById(R.id.button3);
+        mSendButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                postData();
+            }
+        });
+
+        mImageView = (ImageView) findViewById(R.id.imageView);
+        mImageView.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				dispatchTakePictureIntent(PICTURE_REQ_CODE);
+			}
+        });
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    private void dispatchTakePictureIntent(int actionCode) {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+
+        File mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
+        		+ File.separator + "IMG_"+ timeStamp + ".jpg");
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mediaFile)); // set the image file name
+
+        startActivityForResult(intent, actionCode);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    	if (requestCode == PICTURE_REQ_CODE) {
+            Bundle extras = data.getExtras();
+            mImageBitmap = (Bitmap) extras.get("data");
+            mImageView.setImageBitmap(mImageBitmap);
+    	}
+    }
+
+    private void startRecording() {
+        mFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
+        mFileName += "/audiorecordtest.wav";
+
+    	mExtAudioRecorder = ExtAudioRecorder.getInstanse(false);
+        try {
+	    	mExtAudioRecorder.setOutputFile(mFileName);
+	    	mExtAudioRecorder.prepare();
+	    	mExtAudioRecorder.start();
+        } catch (Exception e) {
+            Log.e(LOG_TAG , "recording failed");
+        }
+    }
+
+    private void stopRecording() {
+    	mExtAudioRecorder.stop();
+    	mExtAudioRecorder.release();
+    	mExtAudioRecorder = null;
+    }
+
+    private void onRecord(boolean start) {
+        if (start) {
+            startRecording();
+        } else {
+            stopRecording();
+        }
+    }
+
+    private void startPlaying() {
+        mPlayer = new MediaPlayer();
+        try {
+            mPlayer.setDataSource(mFileName);
+            mPlayer.prepare();
+            mPlayer.start();
+        } catch (IOException e) {
+            Log.e(LOG_TAG , "prepare() failed");
+        }
+    }
+
+    private void stopPlaying() {
+        mPlayer.release();
+        mPlayer = null;
+    }
+
+    private void onPlay(boolean start) {
+        if (start) {
+            startPlaying();
+        } else {
+            stopPlaying();
+        }
+    }
+    
+    public void postData() {
+        // Create a new HttpClient and Post Header
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpPost httppost = new HttpPost("http://localhost:5000/form/");
+
+        try {
+            // Add your data
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+            nameValuePairs.add(new BasicNameValuePair("name", "Furnarius rufus"));
+            nameValuePairs.add(new BasicNameValuePair("date", "2013-06-30"));
+            nameValuePairs.add(new BasicNameValuePair("time", "00:50"));
+            nameValuePairs.add(new BasicNameValuePair("coord_lat", "-22.817708"));
+            nameValuePairs.add(new BasicNameValuePair("coord_lng", "-47.068316"));
+
+            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+            // Execute HTTP Post Request
+            HttpResponse response = httpclient.execute(httppost);
+        } catch (ClientProtocolException e) {
+            // TODO Auto-generated catch block
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+        }
+    } 
+}

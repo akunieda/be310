@@ -1,0 +1,4 @@
+INDEX VERSION 1.126+/Users/akunieda/be310/android/.metadata/.plugins/org.eclipse.jdt.core
+4280989351.index
+3708228729.index
+3213722615.index

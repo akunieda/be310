@@ -3,13 +3,24 @@ from flask import Flask, render_template, request
 from werkzeug import secure_filename
 import bird
 
-UPLOAD_IMAGE_FOLDER = 'static'
-UPLOAD_SOUND_FOLDER = 'static'
+UPLOAD_IMAGE_FOLDER = 'static/images'
+UPLOAD_SOUND_FOLDER = 'static/sounds'
 IMAGE_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
-SOUND_EXTENSIONS = set(['mp3'])
+SOUND_EXTENSIONS = set(['mp3', 'wav'])
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+
+
+def media_type_f(filename):
+    if filename.endswith(".wav"):
+        return u'wav'
+    elif filename.endswith(".mp3"):
+        return u'mpeg'
+    else:
+        return None
+
+app.jinja_env.globals.update(media_type_f=media_type_f)
 
 
 @app.route('/')
@@ -34,16 +45,17 @@ def allowed_file(filename, filetype=None):
 @app.route('/form/', methods=['GET', 'POST'])
 def form():
     if request.method == 'POST':
+        print request.files
         print request.form
 
-        image = request.files['image']
-        sound = request.files['sound']
-        name = request.form['name']
-        common_name = request.form['common_name']
-        date = request.form['date']
-        time = request.form['time']
-        coord_lat = request.form['coord_lat']
-        coord_lng = request.form['coord_lng']
+        image = request.files.get('image')
+        sound = request.files.get('sound')
+        name = request.form.get('name')
+        common_name = request.form.get('common_name')
+        date = request.form.get('date')
+        time = request.form.get('time')
+        coord_lat = request.form.get('coord_lat')
+        coord_lng = request.form.get('coord_lng')
 
         if image and allowed_file(image.filename, "image"):
             image_filename = secure_filename(image.filename)

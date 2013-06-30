@@ -4,6 +4,8 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
 </head>
 <body>
+    <a href="{{ url_for('form') }}" />Enviar novo registro</a><br />
+
     <h1>Lista de pássaros registrados</h1>
     {% for p in passaros %}
         <a href="{{ url_for('bird_page', name=p[0]) }}" />{{ p[1] }}</a><br />
@@ -22,7 +24,7 @@
             {{ r[1] }}<br />
             <a href="{{ url_for('bird_page', name=r[1]) }}"><img src="{{ url_for('static', filename='images/' + r[6]) }}" width="300px" class="square" /></a><br />
             <audio controls>
-                <source src="{{ url_for('static', filename='sounds/' + r[5]) }}" type="audio/mpeg">
+                <source src="{{ url_for('static', filename='sounds/' + r[5]) }}" type="audio/{{ media_type_f(r[5]) }}">
                 Your browser does not support the audio element.
             </audio>
         </div>

@@ -4,6 +4,8 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
 </head>
 <body>
+    <a href="{{ url_for('main') }}" />Voltar à página inicial</a><br />
+
     <h1>{{ passaro[1] }} (<i>{{ passaro[0] }}</i>)</h1>
     {% for reg in registros %}
         <div class="wrap">
